@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  microstuff:
+    image: microstuff
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      VIRTUAL_HOST: microstuff.io
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "app"
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://localhost:12201"
+        tag: "nginx"
